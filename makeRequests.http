@@ -1,0 +1,28 @@
+@URL = https://vttiike0hl.execute-api.ap-southeast-1.amazonaws.com/
+
+
+### Get all users
+GET {{URL}}/users
+
+### Create a user
+POST {{URL}}/users
+Content-Type: application/json
+
+{
+    "name": "coding addict"
+}
+
+### Get a user
+GET {{URL}}/users/1
+
+### Update a user
+PUT {{URL}}/users/1
+Content-Type: application/json
+
+{
+    "name": "coding addict",
+    "email": "coding@addict.com"
+}
+
+### Delete a user
+DELETE {{URL}}/users/1

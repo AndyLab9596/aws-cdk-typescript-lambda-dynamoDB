@@ -5,17 +5,30 @@ import { Construct } from "constructs";
 import path from "path";
 import * as apigateway from "aws-cdk-lib/aws-apigatewayv2";
 import * as apigateway_integrations from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { DynamoDBStack } from "./dynamo-db-stack";
+
+interface UsersApiStackProps extends cdk.StackProps {
+  dynamodbStack: DynamoDBStack;
+}
 
 export class UsersApiStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  // private readonly dynamodbStack: DynamoDBStack;
+  constructor(scope: Construct, id: string, props: UsersApiStackProps) {
     super(scope, id, props);
+
+    // this.dynamodbStack = props.dynamodbStack;
 
     const userHandler = new NodejsFunction(this, "UsersHandler", {
       runtime: Runtime.NODEJS_22_X,
       entry: path.join(__dirname, "../src/lambda/handler.ts"),
       handler: "handler",
       functionName: `${this.stackName}-user-handler`,
+      environment: {
+        TABLE_NAME: props.dynamodbStack.usersTable.tableName
+      }
     });
+
+    props.dynamodbStack.usersTable.grantReadWriteData(userHandler);
 
     const httpApi = new apigateway.HttpApi(this, "UsersApi", {
       apiName: "Users API",
